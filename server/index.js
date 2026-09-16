@@ -31,11 +31,16 @@ app.use("/api/user", userRouter);
 app.use("/api/interview", interviewRouter);
 app.use("/api/payment", paymentRouter);
 
-// Serve frontend static files in production (Must be placed AFTER API routes)
-app.use(express.static(path.join(__dirname, "../client/dist")));
+// Serve frontend static files safely
+const frontendDistPath = path.join(__dirname, "../client/dist");
+app.use(express.static(frontendDistPath));
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+  res.sendFile(path.join(frontendDistPath, "index.html"), (err) => {
+    if (err) {
+      res.status(500).send(err.message);
+    }
+  });
 });
 
 const PORT = process.env.PORT || 6000;
