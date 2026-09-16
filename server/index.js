@@ -25,22 +25,19 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// API Routes
+// 1. API Routes
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/interview", interviewRouter);
 app.use("/api/payment", paymentRouter);
 
-// Serve frontend static files safely
+// 2. Serve static files
 const frontendDistPath = path.join(__dirname, "../client/dist");
 app.use(express.static(frontendDistPath));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendDistPath, "index.html"), (err) => {
-    if (err) {
-      res.status(500).send(err.message);
-    }
-  });
+// 3. SPA Fallback (No path string used, eliminates path-to-regexp crash completely)
+app.use((req, res) => {
+  res.sendFile(path.join(frontendDistPath, "index.html"));
 });
 
 const PORT = process.env.PORT || 6000;
